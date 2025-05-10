@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class TaskCalendarPage extends StatefulWidget {
   final DateTime selectedDate; // Valittu päivämäärä
@@ -10,19 +11,55 @@ class TaskCalendarPage extends StatefulWidget {
 }
 
 class _TaskCalendarPageState extends State<TaskCalendarPage> {
+  final Box _taskBox = Hive.box('tasks'); // Hive-tietokanta
   final TextEditingController _taskController =
       TextEditingController(); // Tekstikentän ohjain
   List<Map<String, dynamic>> _tasks = []; // Tehtävälista
   int _selectedPriority = 1; // Oletusprioriteetti
 
+  @override
+  void initState() {
+    super.initState();
+    _loadTasks(); // Lataa tehtävät tietokannasta
+  }
+
+  void _loadTasks() {
+    final data = _taskBox.values.toList();
+    final selectedDateString =
+        widget.selectedDate.toIso8601String().split(
+          'T',
+        )[0]; // Päivämäärä muodossa "YYYY-MM-DD"
+
+    setState(() {
+      _tasks =
+          data
+              .map((task) => Map<String, dynamic>.from(task as Map))
+              .where(
+                (task) => task['date'] == selectedDateString,
+              ) // Suodata valitun päivän tehtävät
+              .toList();
+    });
+  }
+
+  void _saveTask(Map<String, dynamic> task) {
+    _taskBox.add(task); // Lisää tehtävä tietokantaan
+  }
+
   void _addTask() {
     if (_taskController.text.isNotEmpty) {
+      final newTask = {
+        'name': _taskController.text,
+        'done': false,
+        'priority': _selectedPriority,
+        'date':
+            widget.selectedDate.toIso8601String().split(
+              'T',
+            )[0], // Lisää päivämäärä
+      };
+
       setState(() {
-        _tasks.add({
-          'name': _taskController.text,
-          'done': false,
-          'priority': _selectedPriority,
-        });
+        _tasks.add(newTask); // Lisää tehtävä listaan
+        _saveTask(newTask); // Tallenna tehtävä tietokantaan
         _taskController.clear(); // Tyhjennä tekstikenttä
         _selectedPriority = 1; // Palauta prioriteetti oletukseen
       });
@@ -32,11 +69,13 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
   void _toggleTaskDone(int index) {
     setState(() {
       _tasks[index]['done'] = !_tasks[index]['done']; // Vaihda tehtävän tila
+      _taskBox.putAt(index, _tasks[index]); // Päivitä tietokanta
     });
   }
 
   void _removeTask(int index) {
     setState(() {
+      _taskBox.deleteAt(index); // Poista tehtävä tietokannasta
       _tasks.removeAt(index); // Poista tehtävä listasta
     });
   }
@@ -93,6 +132,7 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
                   _tasks[index]['name'] = editController.text; // Päivitä nimi
                   _tasks[index]['priority'] =
                       updatedPriority; // Päivitä prioriteetti
+                  _taskBox.putAt(index, _tasks[index]); // Päivitä tietokanta
                 });
                 Navigator.of(context).pop(); // Sulje dialogi
               },
