@@ -41,6 +41,69 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
     });
   }
 
+  void _updateTask(int index) {
+    final TextEditingController editController = TextEditingController(
+      text: _tasks[index]['name'],
+    );
+    int updatedPriority = _tasks[index]['priority'];
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Muokkaa tehtävää'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: editController,
+                decoration: const InputDecoration(
+                  labelText: 'Tehtävän nimi',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              DropdownButton<int>(
+                value: updatedPriority,
+                items: const [
+                  DropdownMenuItem(value: 2, child: Text('Tärkeä')),
+                  DropdownMenuItem(value: 1, child: Text('Normaali')),
+                  DropdownMenuItem(value: 0, child: Text('Ei niin tärkeä')),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      updatedPriority = value; // Päivitä prioriteetti
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Sulje dialogi ilman muutoksia
+              },
+              child: const Text('Peruuta'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _tasks[index]['name'] = editController.text; // Päivitä nimi
+                  _tasks[index]['priority'] =
+                      updatedPriority; // Päivitä prioriteetti
+                });
+                Navigator.of(context).pop(); // Sulje dialogi
+              },
+              child: const Text('Tallenna'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,11 +153,28 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
                               }
                             },
                           ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () {
-                              _removeTask(index); // Poista tehtävä
-                            },
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () {
+                                  _updateTask(index); // Muokkaa tehtävää
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () {
+                                  _removeTask(index); // Poista tehtävä
+                                },
+                              ),
+                            ],
                           ),
                         );
                       },
