@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+<<<<<<< Updated upstream
+=======
+import 'calendar_view.dart';
+>>>>>>> Stashed changes
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +23,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const TaskCalendarPage(),
+      home: const CalendarView(), // Avaa kalenterinäkymä
     );
   }
 }
