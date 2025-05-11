@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+// Tämä widget näyttää valitun päivän tehtävät ja mahdollistaa niiden hallinnan.
 class TaskCalendarPage extends StatefulWidget {
   final DateTime selectedDate; // Valittu päivämäärä
 
@@ -10,21 +11,25 @@ class TaskCalendarPage extends StatefulWidget {
   State<TaskCalendarPage> createState() => _TaskCalendarPageState();
 }
 
+// Tämä luokka hallitsee tehtävänäkymän tilaa.
 class _TaskCalendarPageState extends State<TaskCalendarPage> {
-  final Box _taskBox = Hive.box('tasks'); // Hive-tietokanta
+  final Box _taskBox = Hive.box(
+    'tasks',
+  ); // Hive-tietokanta, jossa tehtävät tallennetaan
   final TextEditingController _taskController =
       TextEditingController(); // Tekstikentän ohjain
-  List<Map<String, dynamic>> _tasks = []; // Tehtävälista
-  int _selectedPriority = 1; // Oletusprioriteetti
+  List<Map<String, dynamic>> _tasks = []; // Lista tehtävistä
+  int _selectedPriority = 1; // Oletusprioriteetti uusille tehtäville
 
   @override
   void initState() {
     super.initState();
-    _loadTasks(); // Lataa tehtävät tietokannasta
+    _loadTasks(); // Lataa tehtävät tietokannasta, kun näkymä avataan
   }
 
+  // Lataa tietokannasta valitun päivän tehtävät
   void _loadTasks() {
-    final data = _taskBox.values.toList();
+    final data = _taskBox.values.toList(); // Hae kaikki tietokannan arvot
     final selectedDateString =
         widget.selectedDate.toIso8601String().split(
           'T',
@@ -33,7 +38,9 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
     setState(() {
       _tasks =
           data
-              .map((task) => Map<String, dynamic>.from(task as Map))
+              .map(
+                (task) => Map<String, dynamic>.from(task as Map),
+              ) // Muunna tietokannan tiedot Map-muotoon
               .where(
                 (task) => task['date'] == selectedDateString,
               ) // Suodata valitun päivän tehtävät
@@ -41,20 +48,22 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
     });
   }
 
+  // Lisää uusi tehtävä tietokantaan
   void _saveTask(Map<String, dynamic> task) {
     _taskBox.add(task); // Lisää tehtävä tietokantaan
   }
 
+  // Lisää uusi tehtävä listaan ja tietokantaan
   void _addTask() {
     if (_taskController.text.isNotEmpty) {
       final newTask = {
-        'name': _taskController.text,
-        'done': false,
-        'priority': _selectedPriority,
+        'name': _taskController.text, // Tehtävän nimi
+        'done': false, // Tehtävän tila (ei tehty)
+        'priority': _selectedPriority, // Tehtävän prioriteetti
         'date':
             widget.selectedDate.toIso8601String().split(
               'T',
-            )[0], // Lisää päivämäärä
+            )[0], // Tehtävän päivämäärä
       };
 
       setState(() {
@@ -66,13 +75,15 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
     }
   }
 
+  // Vaihda tehtävän tila (tehty/ei tehty)
   void _toggleTaskDone(int index) {
     setState(() {
-      _tasks[index]['done'] = !_tasks[index]['done']; // Vaihda tehtävän tila
+      _tasks[index]['done'] = !_tasks[index]['done']; // Vaihda tila
       _taskBox.putAt(index, _tasks[index]); // Päivitä tietokanta
     });
   }
 
+  // Poista tehtävä listasta ja tietokannasta
   void _removeTask(int index) {
     setState(() {
       _taskBox.deleteAt(index); // Poista tehtävä tietokannasta
@@ -80,11 +91,12 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
     });
   }
 
+  // Muokkaa olemassa olevaa tehtävää
   void _updateTask(int index) {
     final TextEditingController editController = TextEditingController(
-      text: _tasks[index]['name'],
+      text: _tasks[index]['name'], // Aseta nykyinen nimi tekstikenttään
     );
-    int updatedPriority = _tasks[index]['priority'];
+    int updatedPriority = _tasks[index]['priority']; // Nykyinen prioriteetti
 
     showDialog(
       context: context,
@@ -95,7 +107,8 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                controller: editController,
+                controller:
+                    editController, // Tekstikenttä tehtävän nimen muokkaamiseen
                 decoration: const InputDecoration(
                   labelText: 'Tehtävän nimi',
                   border: OutlineInputBorder(),
@@ -103,7 +116,7 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
               ),
               const SizedBox(height: 16),
               DropdownButton<int>(
-                value: updatedPriority,
+                value: updatedPriority, // Nykyinen prioriteetti
                 items: const [
                   DropdownMenuItem(value: 2, child: Text('Tärkeä')),
                   DropdownMenuItem(value: 1, child: Text('Normaali')),
@@ -149,7 +162,7 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Tehtävät: ${widget.selectedDate.toLocal().toString().split(' ')[0]}',
+          'Tehtävät: ${widget.selectedDate.toLocal().toString().split(' ')[0]}', // Näyttää valitun päivän otsikossa
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
@@ -161,20 +174,21 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
                 _tasks.isEmpty
                     ? const Center(
                       child: Text(
-                        'Ei tehtäviä valitulle päivälle.',
+                        'Ei tehtäviä valitulle päivälle.', // Näytetään, jos tehtäviä ei ole
                         style: TextStyle(fontSize: 18),
                       ),
                     )
                     : ListView.builder(
-                      itemCount: _tasks.length,
+                      itemCount: _tasks.length, // Tehtävien määrä
                       itemBuilder: (context, index) {
                         return ListTile(
                           title: Text(
-                            _tasks[index]['name'],
+                            _tasks[index]['name'], // Tehtävän nimi
                             style: TextStyle(
                               decoration:
                                   _tasks[index]['done']
-                                      ? TextDecoration.lineThrough
+                                      ? TextDecoration
+                                          .lineThrough // Yliviivaa tehty tehtävä
                                       : TextDecoration.none,
                             ),
                           ),
@@ -186,10 +200,10 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
                                 : 'Ei niin tärkeä'}',
                           ),
                           leading: Checkbox(
-                            value: _tasks[index]['done'],
+                            value: _tasks[index]['done'], // Tehtävän tila
                             onChanged: (value) {
                               if (value != null) {
-                                _toggleTaskDone(index); // Vaihda tehtävän tila
+                                _toggleTaskDone(index); // Vaihda tila
                               }
                             },
                           ),
@@ -227,7 +241,8 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
               children: [
                 Expanded(
                   child: TextField(
-                    controller: _taskController,
+                    controller:
+                        _taskController, // Tekstikenttä uuden tehtävän lisäämiseen
                     decoration: const InputDecoration(
                       labelText: 'Lisää uusi tehtävä',
                       border: OutlineInputBorder(),
@@ -236,7 +251,7 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
                 ),
                 const SizedBox(width: 8),
                 DropdownButton<int>(
-                  value: _selectedPriority,
+                  value: _selectedPriority, // Valittu prioriteetti
                   items: const [
                     DropdownMenuItem(value: 2, child: Text('Tärkeä')),
                     DropdownMenuItem(value: 1, child: Text('Normaali')),
@@ -251,7 +266,10 @@ class _TaskCalendarPageState extends State<TaskCalendarPage> {
                   },
                 ),
                 const SizedBox(width: 8),
-                ElevatedButton(onPressed: _addTask, child: const Text('Lisää')),
+                ElevatedButton(
+                  onPressed: _addTask, // Lisää uusi tehtävä
+                  child: const Text('Lisää'),
+                ),
               ],
             ),
           ),
