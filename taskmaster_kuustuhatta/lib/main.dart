@@ -1,11 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+<<<<<<< Updated upstream
+=======
+import 'notification_service.dart'; // Importoi ilmoituspalvelu
+import 'calendar_view.dart'; // Importoi kalenterinäkymä
+>>>>>>> Stashed changes
 
 void main() async {
+<<<<<<< Updated upstream
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter(); // Alusta Hive
   await Hive.openBox('tasks'); // Avaa tai luo "tasks"-tietokanta
   runApp(const MyApp());
+=======
+  WidgetsFlutterBinding.ensureInitialized(); // Varmistaa, että widgetit alustetaan ennen sovelluksen käynnistämistä
+  await Hive.initFlutter(); // Alustaa Hive-tietokannan
+  await Hive.openBox('tasks'); // Avaa tai luo "tasks"-nimisen tietokannan
+
+  // Alusta ilmoituspalvelu
+  await NotificationService.initialize();
+
+  runApp(const MyApp()); // Käynnistää sovelluksen
+>>>>>>> Stashed changes
 }
 
 class MyApp extends StatelessWidget {
