@@ -8,8 +8,10 @@ class NotificationService {
   static Future<void> initialize() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
+
     const InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
+
     await _notificationsPlugin.initialize(initializationSettings);
   }
 
@@ -25,7 +27,9 @@ class NotificationService {
           'Korkean prioriteetin tehtävät', // Kanavan nimi
           importance: Importance.high,
           priority: Priority.high,
+          playSound: true, // Soittaa äänen
         );
+
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
     );

@@ -37,11 +37,8 @@ dependencies:
 
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-<<<<<<< Updated upstream
-=======
   table_calendar: ^3.0.8
-  flutter_local_notifications: ^19.2.0
->>>>>>> Stashed changes
+  flutter_local_notifications: 19.2.0
 
 dev_dependencies:
   flutter_test:

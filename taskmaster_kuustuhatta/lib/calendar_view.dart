@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'notification_service.dart'; // Importoi ilmoituspalvelu
 import 'task_calendar_page.dart'; // Importoi TaskCalendarPage-näkymä
+import 'notification_service.dart'; // Importoi NotificationService
 
 // Tämä widget näyttää kuukausikalenterinäkymän.
 class CalendarView extends StatefulWidget {
@@ -24,7 +24,7 @@ class _CalendarViewState extends State<CalendarView> {
   @override
   void initState() {
     super.initState();
-    _scheduleHighPriorityNotifications();
+    _scheduleNotifications(); // Aikatauluta ilmoitukset sovelluksen käynnistyessä.
   }
 
   // Tarkistaa, onko valitulle päivälle tehtäviä, joita ei ole merkitty tehdyiksi.
@@ -40,8 +40,8 @@ class _CalendarViewState extends State<CalendarView> {
     return tasks.isNotEmpty;
   }
 
-  // Aikatauluta korkean prioriteetin tehtävien ilmoitukset
-  void _scheduleHighPriorityNotifications() {
+  // Aikatauluta korkean prioriteetin tehtävien ilmoitukset.
+  void _scheduleNotifications() {
     final tasks =
         _taskBox.values.where((task) {
           final taskMap = Map<String, dynamic>.from(task as Map);
@@ -55,7 +55,7 @@ class _CalendarViewState extends State<CalendarView> {
       final taskMap = Map<String, dynamic>.from(tasks[i] as Map);
       NotificationService.showNotification(
         i, // Ilmoituksen ID
-        'Korkean prioriteetin tehtävä', // Otsikko
+        'Tärkeä tehtävä', // Otsikko
         '${taskMap['name']} erääntyy ${taskMap['date']}', // Viesti
       );
     }
@@ -102,10 +102,6 @@ class _CalendarViewState extends State<CalendarView> {
                 color: Colors.blue, // Nykyisen päivän korostusväri.
                 shape: BoxShape.circle, // Nykyisen päivän muoto.
               ),
-              // selectedDecoration: BoxDecoration(
-              //   color: Colors.orange, // Valitun päivän korostusväri.
-              //   shape: BoxShape.circle, // Valitun päivän muoto.
-              // ),
             ),
             headerStyle: const HeaderStyle(
               formatButtonVisible:
