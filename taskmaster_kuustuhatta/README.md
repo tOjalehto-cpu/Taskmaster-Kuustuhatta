@@ -1,16 +1,20 @@
 # taskmaster_kuustuhatta
 
-A new Flutter project.
+Taskmaster Kuustuhatta on Flutterilla toteutettu tehtävienhallintasovellus. Sovellus toimii useilla alustoilla (Android, iOS, Windows, macOS, Linux, Web).
 
-## Getting Started
+## Ominaisuudet
 
-This project is a starting point for a Flutter application.
+- Tehtävien luonti, muokkaus ja poisto ns. CRUD
+- Tehtävien merkitseminen suoritetuiksi
+- Monialustatuki
+- Moderni ja selkeä käyttöliittymä
+-Push ilmoitukset
 
-A few resources to get you started if this is your first Flutter project:
+## Asennus
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+1. Varmista, että sinulla on [Flutter](https://flutter.dev/) asennettuna.
+2. Kloonaa tämä repositorio:
+   ```sh
+   git clone https://github.com/<käyttäjänimi>/Taskmaster-Kuustuhatta.git
+   ```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
